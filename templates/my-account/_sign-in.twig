@@ -1,0 +1,48 @@
+{% extends "_layout" %}
+{% set title = "Вход" %}
+{% block main %}
+
+<div class="uk-section my-account uk-container">
+  <div class="uk-padding uk-background-default uk-border-rounded">
+
+    <h2 class="uk-text-bold uk-text-center">Вход в {{ siteName }}</h2>
+    {% if errorMessage is defined %}<p class="uk-text-center">{{ errorMessage }}</p>{% endif %}
+
+    <form method="post" accept-charset="UTF-8">
+      {{ csrfInput() }}
+      {{ actionInput('users/login') }}
+      {{ redirectInput('{{ siteUrl }}/my-account') }}
+
+      <div class="uk-margin">
+        <div class="uk-inline uk-width-1-1">
+          <span class="uk-form-icon" data-uk-icon="icon: user"></span>
+          <input class="uk-input uk-form-large uk-border-rounded" type="text" name="loginName" value="{{ craft.app.user.rememberedUsername }}">
+        </div>
+      </div>
+
+      <div class="uk-margin">
+        <div class="uk-inline uk-width-1-1">
+          <span class="uk-form-icon" data-uk-icon="icon: lock"></span>
+          <input class="uk-input uk-form-large uk-border-rounded" type="password" name="password" value="{{ craft.app.user.rememberedUsername }}">
+        </div>
+      </div>
+
+      <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+        <label><input class="uk-checkbox uk-border-rounded" type="checkbox" name="rememberMe" value="1"> Запомнить меня</label>
+      </div>
+
+      <div class="uk-margin uk-grid-small uk-child-width-1-2@s" data-uk-grid>
+        <div><input class="uk-button uk-button-primary uk-button-search uk-border-rounded uk-width-1-1 uk-text-bold" type="submit" value="Войти"></div>
+        <div><a class="uk-button uk-button-default uk-border-rounded uk-width-1-1 uk-text-bold" href="{{ url('/my-account/sign-up') }}">Регистрация</a></div>
+      </div>
+
+      <div class="uk-margin-medium-top uk-text-center">
+        <a class="uk-link-muted" href="{{ url('/my-account/lost-password') }}">Забыли пароль или не можете войти?</a>
+      </div>
+
+    </form>
+
+  </div>
+</div>
+
+{% endblock %}

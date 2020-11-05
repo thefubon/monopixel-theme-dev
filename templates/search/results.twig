@@ -1,0 +1,36 @@
+{% extends "_layout" %}
+{% set title = "Поиск" %}
+{% block main %}
+
+<section class="uk-section uk-section-small">
+<div class="uk-container uk-container-medium">
+
+	<h2>Результаты поиска</h2>
+
+	{% set searchQuery = craft.app.request.getParam('q') %}
+	{% set results = craft.entries.search(searchQuery).all() %}
+
+	{% if craft.app.request.getParam('q')|length %} {# results|length #}
+	    <p>Найдено запросов: {{ results|length }}</p>
+
+	    <ul class="uk-list uk-list-divider">
+	        {% for entry in results %}
+	          <li><a href="{{ entry.url }}">{{ entry.title }}</a></li>
+	        {% endfor %}
+	    </ul>
+	{% else %}
+
+		<div class="uk-margin">
+			<form class="uk-search uk-search-default uk-background-default uk-width-1-1" action="{{ url('search/results') }}">
+				<button class="uk-search-icon-flip uk-button-search" type="submit" data-uk-search-icon data-uk-svg id="submit"></button>
+				<input class="uk-search-input uk-border-rounded uk-form-large" type="search" name="q" placeholder="Что ищем?" id="name" autocomplete="off" onkeyup="checkParams()" required="required">
+			</form>
+		</div>
+
+	  {#<p>Ваш поиск по запросу «{{ searchQuery }}» не дал никаких результатов.</p>#}
+	{% endif %}
+
+</div>
+</section>
+
+{% endblock %}

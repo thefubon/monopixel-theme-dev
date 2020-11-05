@@ -1,0 +1,71 @@
+{% extends "_layout" %}
+{% set title = "Добавить пост" %}
+{% block main %}
+
+{% requireLogin %}
+
+<div class="uk-section uk-section-small uk-container uk-container-medium" style="max-width: 960px;">
+
+{% macro errorList(errors) %}
+  {% if errors %}
+      <ul class="errors uk-list uk-text-meta">
+          {% for error in errors %}
+              <li class="uk-text-danger">{{ error }}</li>
+          {% endfor %}
+      </ul>
+  {% endif %}
+{% endmacro %}
+
+<form class="uk-margin-medium" method="post" accept-charset="UTF-8">
+    {{ csrfInput() }}
+    {{ actionInput('entries/save-entry') }}
+    {#{ redirectInput('{section.slug}/{slug}') }#}
+    {{ hiddenInput('enabled', '1') }}
+
+    {% set notice = craft.app.session.getFlash('notice') %}
+    {% if notice %}
+      <div class="uk-alert-success" uk-alert>
+        <a class="uk-alert-close" uk-close></a>
+        <p>{{ notice }}</p>
+      </div>
+    {% endif %}
+
+    <div class="uk-margin-medium">
+    <label for="title">Название</label>
+    <input id="title" class="uk-input" type="text" name="title" {%- if entry is defined %} value="{{ entry.title }}"{% endif -%}>
+
+    {% if entry is defined %}
+        {{ _self.errorList(entry.getErrors('title')) }}
+    {% endif %}
+    </div>
+
+    <div class="uk-margin-medium">
+    <label for="text">Текст</label>
+  <textarea id="text" class="uk-textarea" rows="10" name="fields[text]">{%- if entry is defined %}{{ entry.text }}{% endif -%}</textarea>
+
+    {% if entry is defined %}
+      {{ _self.errorList(entry.getErrors('text')) }}
+    {% endif %}
+    </div>
+
+    <div class="uk-margin-medium">
+    <label for="text">Редактор</label>
+    <textarea id="text" class="uk-textarea" rows="10" name="fields[redactor]">{%- if entry is defined %}{{ entry.redactor }}{% endif -%}</textarea>
+
+    {% if entry is defined %}
+        {{ _self.errorList(entry.getErrors('redactor')) }}
+    {% endif %}
+    </div>
+
+    <div class="uk-margin uk-grid-small uk-child-width-auto uk-grid">
+      <label><input class="uk-radio" type="radio" name="sectionId" value="2"> Страницы</label>
+      <label><input class="uk-radio" type="radio" name="sectionId" value="3"> Статьи</label>
+      <label><input class="uk-radio" type="radio" name="sectionId" value="7"> Новости</label>
+      <label><input class="uk-radio" type="radio" name="sectionId" value="8"> Игры</label>
+      <label><input class="uk-radio" type="radio" name="sectionId" value="9" checked> Блоги</label>
+    </div>
+    <input class="uk-button uk-button-primary uk-border-rounded" type="submit" value="Добавить пост">
+</form>
+
+</div>
+{% endblock %}

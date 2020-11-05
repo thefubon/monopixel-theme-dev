@@ -1,0 +1,270 @@
+{% extends "_layout" %}
+{% set title = "Консольные и ретро игры" %}
+{% block main %}
+
+<div class="uk-section uk-section-xsmall uk-container uk-container-medium">
+
+	{% if craft.youtubelive.isLive() %}
+		{{ craft.youtubelive.embedStream() }}
+	{% endif %}
+
+	<h2>{{ 'Games'|t }}</h2>
+
+	<div class="uk-grid-small uk-margin-medium" data-uk-grid>
+		<div class="uk-width-expand@m uk-position-relative">
+			{% set articles = craft.entries().section('articles').limit(1).all() %}
+			{% for entry in articles|slice(0,1) %}
+			<div class="item-large uk-border-rounded uk-position-relative uk-cover-container">
+				{% set entryImage = entry.thumbnail.all() %}
+				{% if entryImage|length %}
+				  {% for img in entryImage %}
+					<a class="uk-link-text" href="{{ entry.url }}"><img src="{{ img.getUrl }}" alt="entry.title"></a>
+					{% endfor %}
+				{% endif %}
+				<div class="uk-position-center uk-position-medium uk-light">
+					<h2 class="uk-h3 uk-margin-remove uk-text-bold uk-text-center">{{ entry.title }}</h2>
+					<p class="uk-text-small uk-margin-remove">Добавлено {{ entry.postDate.diff(now)|duration(false) }} назад.</p>
+				</div>
+				<a class="uk-link-text uk-position-cover" href="{{ entry.url }}"></a>
+			</div>
+			<div class="uk-position-top-right" style="right: 25px; top: -15px;"><img src="/static/img/new.png" alt="new" width="60" /></div>
+			{% endfor %}
+		</div><!-- 1th -->
+		<div class="uk-width-1-3@m">
+			<div class="uk-grid-small" data-uk-grid>
+				{% set articles = craft.entries().section('articles').limit(3).all() %}
+				{% for entry in articles|slice(1,2) %}
+				<div class="uk-width-1-2 uk-width-1-1@m">
+					<div class="item-small uk-border-rounded uk-overflow-hidden uk-position-relative uk-cover-container">
+						{% set entryImage = entry.thumbnail.all() %}
+						{% if entryImage|length %}
+						  {% for img in entryImage %}
+							<a class="uk-link-text" href="{{ entry.url }}"><img src="{{ img.getUrl }}" alt="entry.title"></a>
+							{% endfor %}
+						{% endif %}
+						<div class="uk-position-bottom uk-position-medium uk-light">
+							<h2 class="uk-h6 uk-margin-remove">{{ entry.title }}</h2>
+							<p class="uk-text-small uk-margin-remove">Posted {{ entry.postDate.diff(now)|duration(false) }} ago.</p>
+						</div>
+						<a class="uk-link-text uk-position-cover" href="{{ entry.url }}"></a>
+					</div>
+				</div>
+			{% endfor %}
+			</div>
+		</div><!-- 2th -->
+		<div class="uk-width-1-1@s uk-width-1-4@m">
+			<div class="item-large uk-background-default uk-border-rounded uk-overflow-hidden uk-position-relative uk-transition-toggle" tabindex="0">
+				<ul class="uk-list uk-list-divider uk-padding-small">
+					{% set articles = craft.entries().section('articles').limit(10).all() %}
+					{% for entry in articles|slice(3) %}
+					<li>
+						<h2 class="uk-h5 uk-margin-remove uk-text-bold"><a class="uk-link-reset" href="{{ entry.url }}">{{ entry.title }}</a></h2>
+						<p class="uk-margin-remove uk-text-meta">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+						<p class="uk-text-meta">Добавлено {{ entry.postDate.diff(now)|duration(false) }} назад.</p>
+					</li>
+					{% endfor %}
+				</ul>
+				<div class="uk-position-bottom uk-padding-small uk-background-default uk-text-center">
+	        <a class="uk-link-reset uk-text-small" href="{{ siteUrl('/articles') }}">Смотреть все статьи</a>
+	    	</div>
+			</div>
+		</div><!-- 3th -->
+	</div><!-- .uk-grid -->
+
+	<div class="uk-margin-medium">
+		<div class="uk-grid-small" data-uk-grid data-uk-height-match="target: > div > .uk-card">
+			<div class="uk-width-expand@m">
+				<h4 class="uk-margin-small-bottom">Реклама</h4>
+				<div class="uk-card uk-border-rounded uk-flex uk-flex-middle" style="background: #6e7bfe;">
+						{{ craft.adWizard.randomizeAdGroup('homepage1200x200', {'attr': {'alt': '{image.title}', 'class': 'uk-border-rounded'} }) }}
+				</div>
+			</div>{# Banner #}
+			<div class="uk-width-1-4@m">
+				<h4 class="uk-margin-small-bottom">Игровой дайджест</h4>
+				<div class="uk-card subscribe uk-background-default uk-border-rounded uk-padding-small uk-flex uk-flex-middle">
+					<form class="newsletter-form uk-width-1-1" action="#" method="post">
+						{{ csrfInput() }}
+						<input type="hidden" name="action" value="mailchimp-subscribe/audience/subscribe">
+						{% set subscribeResponse = mailchimpSubscribe is defined and mailchimpSubscribe.action == 'subscribe' ? mailchimpSubscribe : null %}
+						<label for="emailInput"{% if subscribeResponse and subscribeResponse.errorCode=='1000' %} class="error"{% endif %}>Email:</label>
+						<div class="uk-margin-small">
+							<input id="emailInput" class="uk-input uk-border-rounded" type="text" name="email"
+							{% if subscribeResponse and not subscribeResponse.success %}value="{{ subscribeResponse.values.email ?? '' }}"{% endif %} required>
+						</div>
+						<div class="uk-margin-small uk-text-meta">
+			        <input type="hidden" value="" name="tags">
+			        <input class="uk-checkbox uk-border-circle" type="checkbox" value="news" name="tags[]"> Новости
+			        <input class="uk-checkbox uk-border-circle" type="checkbox" value="articles" name="tags[]"> Статьи
+			        <input class="uk-checkbox uk-border-circle" type="checkbox" value="games" name="tags[]"> Игры
+						</div>
+						<input class="uk-button uk-button-default uk-margin-small uk-border-rounded" type="submit" name="submit" value="Подписаться"/>
+						{% if subscribeResponse %}
+							{% if subscribeResponse.success %}
+								<p class="uk-margin-remove uk-text-small">Спасибо! Вам отправленно письмо с подтверждением.</p>
+							{% else %}
+								<p class="uk-margin-remove uk-text-danger uk-text-small">{{ subscribeResponse.message }}</p>
+							{% endif %}
+						{% endif %}
+					</form>
+				</div>
+			</div>{# Subscribe #}
+		</div>{# Banner + Subscribe #}
+	</div>
+
+	<div class="uk-section uk-section-xsmall uk-container uk-container-medium">
+	  {% set consoles = craft.categories({
+	    group: 'games_category',
+	    level: 1,
+	  }).all() %}
+
+	  {# You had used a `nav` tag here, but for the sake of a simple example, I'm using a flat `for` loop: #}
+	  {% for console in consoles %}
+	    <h2>{{ console.title }}</h2>
+	    <p><a href="{{ console.url }}">Смотреть все</a></p>
+
+	    {# Иконки категории игры #}
+	    {% set image = craft.assets.relatedTo( console ).one() %}
+	    {% if image | length %}
+	    {% set optimizedImages = image.gamesCategpryOptimizedImages %}
+	      <picture>
+	        <source srcset="{{ optimizedImages.srcsetWebP() }}" sizes="100vw" type="image/webp" />
+	        <img  style="width: 200px;" src="{{ optimizedImages.src() }}" srcset="{{ optimizedImages.srcset() }}" sizes="100vw" width="{{ optimizedImages.maxSrcsetWidth() }}" alt="{{ category.title }}" />
+	      </picture>
+	    {% endif %}
+
+	    {# Use the `relatedTo` param to filter by games that reference the current category: #}
+	    {% set gamesOnConsole = craft.entries({
+	      section: 'games',
+	      relatedTo: console,
+	    }).limit(4).all() %}
+
+	    <ul class="uk-child-width-1-4@m uk-grid-match" data-uk-grid>
+	      {% for game in gamesOnConsole %}
+	        <li>
+	          <div class="uk-card uk-card-default uk-card-small uk-card-body">
+
+	            {% set image = game.gamesCover.one() %}
+	            {% if image | length %}
+	            {% set optimizedImages = image.optimizedImagesGames %}
+	              <picture>
+	                <source data-srcset="{{ optimizedImages.srcsetWebP() }}" data-sizes="100vw" type="image/webp" />
+	                <div class="uk-inline">
+	                  <a href="{{ game.url }}"><img class="lazyload uk-width-1-1 uk-border-rounded" src="{{ optimizedImages.placeholderBox() }}" data-srcset="{{ optimizedImages.srcset() }}" data-sizes="100vw" alt="{{ game.title }}" /></a>
+
+	                  <div class="uk-transition-fade uk-position-bottom-right uk-position-small">
+	                    <a href="" class="games-icon-settings uk-icon-button uk-margin-small-right" uk-icon="icon: tag; ratio: 0.8"></a>
+	                    <a href="" class="games-icon-settings uk-icon-button" uk-icon="icon: bookmark; ratio: 0.8"></a>
+	                  </div>
+
+	                </div>
+	              </picture>
+	            {% endif %}
+
+	            <a href="{{ game.url }}">{{ game.title }}</a>
+
+	          </div>
+	        </li>
+	      {% endfor %}
+	    </ul>
+	  {% endfor %}
+	</div>
+
+	<h2>{{ 'News'|t }}</h2>
+
+	<div data-uk-slider="center: false; finite: true;">
+    <div class="uk-position-relative uk-visible-toggle" tabindex="-1">
+		{% set relatedEntries = craft.entries().section('news').limit(6).all() %}
+		{% if relatedEntries|length %}
+      <ul class="uk-slider-items uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l uk-grid-match uk-grid">
+				{% for entry in relatedEntries  %}
+					<li>
+              <div id="{{ entry.id }}" class="uk-card uk-card-small uk-card-default uk-text-center uk-border-rounded">
+                  <div class="uk-card-media-top">
+									{% set entryImage = entry.thumbnail.all() %}
+									{% if entryImage|length %}
+										{% for img in entryImage %}
+										<a class="uk-link-text" href="{{ entry.url }}"><a class="uk-link-text" href="{{ entry.url }}"><img src="{{ img.getUrl }}" alt="entry.title"></a></a>
+										{% endfor %}
+									{% endif %}
+                  </div>
+                  <div class="uk-card-body">
+									<h3 class="uk-h3 uk-text-bold">{{ entry.title }}</h3>
+									<p class="uk-article-meta">{{ entry.author }} | {{ entry.postDate|date('d.m.Y') }}</p>
+									<p class="uk-text-meta">Добавлено {{ entry.postDate.diff(now)|duration(false) }} назад.</p>
+
+									<img src="/static/img/icon/icons8-facebook_like.svg" alt="Like" width="18" style="position: relative; top: -1px;" />
+									{{ craft.upvote.tally(entry.id) }}/{{ craft.upvote.totalVotes(entry.id) }} |
+
+									<img src="/static/img/icon/icons8-comments.svg" alt="Comments" width="18" style="position: relative; top: -1px;" />
+									{% set commentsWork = craft.commentsWork.service %}
+									{{ commentsWork.countComments(entry) }}
+                  </div>
+              </div>
+          </li>
+				{% endfor %}
+				<li>
+
+					<div class="uk-card uk-card-small uk-card-secondary uk-text-center uk-position-relative uk-border-rounded">
+						<div class="uk-card-body">
+							<h3 class="uk-h3 uk-text-bold uk-position-center">Смотреть все новости</h3>
+							<a class="uk-link-reset uk-position-cover" href="/news"></a>
+						</div>
+					</div>
+				</li>
+      </ul>
+		{% endif %}
+      <a class="uk-position-center-left uk-position-small uk-hidden-hover" href="#" data-uk-slidenav-previous data-uk-slider-item="previous"></a>
+      <a class="uk-position-center-right uk-position-small uk-hidden-hover" href="#" data-uk-slidenav-next data-uk-slider-item="next"></a>
+  	</div>
+  		<ul class="uk-slider-nav uk-dotnav uk-flex-center uk-margin-medium-top"></ul>
+	</div>
+
+	<h2>{{ 'Market'|t }}</h2>
+
+	<div class="uk-child-width-1-4@m uk-grid-medium" data-uk-grid>
+
+		<div>
+			<div class="uk-card uk-card-border uk-card-body uk-card-small uk-border-rounded uk-card-hover">
+				<div class="uk-card-media-top uk-background-muted uk-padding uk-border-rounded uk-text-center">
+					<img src="/static/img/empty/smd.png" alt="">
+				</div>
+				<h4 class="uk-margin-small-top uk-margin-remove-bottom uk-h5">The Lion King</h4>
+				<p class="uk-text-meta uk-margin-remove">Sega mega drive</p>
+			</div>
+		</div>
+
+		<div>
+			<div class="uk-card uk-card-border uk-card-body uk-card-small uk-border-rounded uk-card-hover">
+				<div class="uk-card-media-top uk-background-muted uk-padding uk-border-rounded uk-text-center">
+					<img src="/static/img/empty/smd.png" alt="">
+				</div>
+				<h4 class="uk-margin-small-top uk-margin-remove-bottom uk-h5">The Lion King</h4>
+				<p class="uk-text-meta uk-margin-remove">Sega mega drive</p>
+			</div>
+		</div>
+
+		<div>
+			<div class="uk-card uk-card-border uk-card-body uk-card-small uk-border-rounded uk-card-hover">
+				<div class="uk-card-media-top uk-background-muted uk-padding uk-border-rounded uk-text-center">
+					<img src="/static/img/empty/smd.png" alt="">
+				</div>
+				<h4 class="uk-margin-small-top uk-margin-remove-bottom uk-h5">The Lion King</h4>
+				<p class="uk-text-meta uk-margin-remove">Sega mega drive</p>
+			</div>
+		</div>
+
+		<div>
+			<div class="uk-card uk-card-border uk-card-body uk-card-small uk-border-rounded uk-card-hover">
+				<div class="uk-card-media-top uk-background-muted uk-padding uk-border-rounded uk-text-center">
+					<img src="/static/img/empty/smd.png" alt="">
+				</div>
+				<h4 class="uk-margin-small-top uk-margin-remove-bottom uk-h5">The Lion King</h4>
+				<p class="uk-text-meta uk-margin-remove">Sega mega drive</p>
+			</div>
+		</div>
+
+	</div>
+
+</div>
+
+{% endblock %}

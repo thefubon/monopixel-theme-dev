@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+  <meta name="robots" content="noindex,follow"/>
+  <title>{{ siteName }} - Under Construction!</title>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/uikit@3.2.3/dist/css/uikit.min.css" />
+	<script src="//cdn.jsdelivr.net/npm/uikit@3.2.3/dist/js/uikit.min.js"></script>
+	<style>
+		html, body {
+			background: #6e7bfe;
+			margin: 0;
+			padding: 0;
+			text-align: center;
+			font-size: 15px;
+		}
+		.uk-container {
+			width: 760px !important;
+			max-width: 760px !important;
+			min-width: 760px !important;
+			padding: 0;
+		}
+		img {
+			width: 100%;
+			min-width: 760px !important;
+		}
+	</style>
+</head>
+<body>
+	<div class="uk-position-relative uk-container uk-container-small">
+		<img src="/static/img/under-construction.jpg" alt="Undec Construction" width="760" />
+		<div class="uk-position-top-left" style="left: 125px; top: 120px;"><strong>{{ systemName|t }}</strong> - Скоро открытие!</div>
+	</div>
+	<div class="uk-container uk-container-small">
+		<p class="uk-light">Сделано в <a class="uk-link-reset" href="//fubon.pro" target="_blank"><strong>Fubon</strong></p>
+	</div>
+</body>
+</html>

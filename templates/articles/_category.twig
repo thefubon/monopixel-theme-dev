@@ -1,0 +1,60 @@
+{% extends "_layout" %}
+{% set title = category.title ~ ' - Статьи' %}
+{% block main %}
+
+<section class="uk-section">
+<div class="uk-container uk-container-medium">
+
+	{% set nodes = craft.navigation.nodes('articlesCategory').all() %}
+	<ul class="uk-subnav uk-subnav-pill">
+		<li><a href="/articles">Все</a></li>
+		{% nav node in nodes %}
+				<li class="{% if node.active %}uk-active{% endif %}">
+						{{ node.link }}
+						{% ifchildren %}
+						<div class="uk-navbar-dropdown" uk-dropdown="offset: 0;">
+				<ul class="uk-nav uk-navbar-dropdown-nav">
+									{% children %}
+				</ul>
+			</div>
+						{% endifchildren %}
+				</li>
+		{% endnav %}
+	</ul>{# Category Menu #}
+
+
+	<ul class="uk-child-width-1-2@s uk-child-width-1-3@m uk-child-width-1-4@l uk-flex-center uk-rgid-match" data-uk-grid>
+	{% set query = craft.entries().section('articles').limit(10).relatedTo(category) %}
+	{% paginate query as pageInfo, pageEntries %}
+	{% for entry in pageEntries %}
+
+		<li class="featuredWork-container">
+
+			<h1 class="uk-h3 uk-text-bold">{{ entry.title }}</h1>
+		</li>
+	{% endfor %}
+	</ul>
+
+
+	<ul class="uk-pagination uk-flex-center" uk-margin>
+		<li class="uk-hidden"><a href="{{ pageInfo.firstUrl }}">First Page</a></li>
+		{% if pageInfo.prevUrl %}<li><a href="{{ pageInfo.prevUrl }}"><span class="uk-margin-small-right" uk-pagination-previous></span> Previous Page</a></li>{% endif %}
+
+	    {% for page, url in pageInfo.getPrevUrls(5) %}
+		    <li><a href="{{ url }}">{{ page }}</a></li>
+		{% endfor %}
+
+	    {% if pageInfo.currentPage %}<li class="uk-active">{{ pageInfo.currentPage }}</li>{% endif %}
+
+	    {% for page, url in pageInfo.getNextUrls(5) %}
+		    <li><a href="{{ url }}">{{ page }}</a></li>
+		{% endfor %}
+
+	    {% if pageInfo.nextUrl %}<li><a href="{{ pageInfo.nextUrl }}">Next Page <span class="uk-margin-small-left" uk-pagination-next></span></a></li>{% endif %}
+	    <li class="uk-hidden"><a href="{{ pageInfo.lastUrl }}">Last Page</a></li>
+	</ul>
+
+</div>
+</section>
+
+{% endblock %}

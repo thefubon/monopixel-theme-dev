@@ -1,0 +1,61 @@
+{% extends "_layout" %}
+{% set title = entry.title ~ ' - Игры' %}
+{% block main %}
+<div class="uk-section uk-section-xsmall uk-container uk-container-medium">
+
+  <p class="uk-article-meta">{{ entry.author }} | {{ entry.postDate|date('d.m.Y') }} | {{ craft.starRatings.stars(entry.id) }} | {% do craft.upvote.setIcons({up:'<i class="fa fa-thumbs-up"></i>',down:'<i class="fa fa-thumbs-down"></i>',}) %} {{ craft.upvote.upvote(entry.id) }}{{ craft.upvote.tally(entry.id) }}{{ craft.upvote.downvote(entry.id) }} Всего: {{ craft.upvote.totalVotes(entry.id) }}</p>
+
+
+  {% set relatedEntries = entry.similarGames.all() %}
+  {% if relatedEntries|length %}
+    <ul>
+      {% for rel in relatedEntries %}
+        <li><a href="{{ rel.url }}">{{ rel.title }}</a></li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+
+  <ul class="uk-child-width-1-3@m uk-flex-middle" data-uk-grid>
+    {% set params = {section: 'news'} %}
+    {% set prevEntry = entry.getPrev(params) %}
+    {% set nextEntry = entry.getNext(params) %}
+    <li  class="uk-text-left">
+
+    {% if prevEntry %}
+      <a class="uk-button uk-button-default uk-border-rounded" href="{{ prevEntry.url }}">
+
+        {% set entryImage = prevEntry.thumbnail.all() %}
+        {% if entryImage|length %}
+          {% for img in entryImage %}
+          <a class="uk-link-text" href="{{ entry.url }}"><img src="{{ img.getUrl }}"></a>
+          {% endfor %}
+        {% endif %}
+
+        {{ prevEntry.title }}
+
+      </a>
+    {% endif %}
+    </li>
+    <li class="uk-text-center">
+      <a class="uk-link-reset uk-button uk-button-default uk-border-rounded" href="{{ url(craft.app.request.segments|first) }}">Back to what's on tap</a>
+    </li>
+    <li class="uk-text-right">
+    {% if nextEntry %}
+      <a class="uk-button uk-button-default uk-border-rounded" href="{{ nextEntry.url }}">
+
+        {% set entryImage = nextEntry.thumbnail.all() %}
+        {% if entryImage|length %}
+          {% for img in entryImage %}
+          <a class="uk-link-text" href="{{ entry.url }}"><img src="{{ img.getUrl }}"></a>
+          {% endfor %}
+        {% endif %}
+
+        {{ nextEntry.title }}
+      </a>
+    {% endif %}
+    </li>
+  </ul>
+
+</div>
+{% endblock %}

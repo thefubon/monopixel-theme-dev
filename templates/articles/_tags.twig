@@ -1,0 +1,21 @@
+{% extends "_layout" %}
+{% set title = tags.title ~ ' - Статьи' %}
+{% block main %}
+
+	
+	<section id="categoryWork" class="categoryWork uk-section uk-section-small uk-section-default">
+		<div class="uk-container uk-container-medium uk-container uk-container-medium-large">
+	
+						{% set relatedTags = entry.articlesTags.all() %}
+				{% if relatedTags|length %}
+				    <ul>
+				        {% for rel in relatedTags %}
+				            <li><a href="{{ url('tags/'~rel.slug) }}">{{ rel.title }}</a></li>
+				        {% endfor %}
+				    </ul>
+				{% endif %}
+		
+		</div>
+	</section>
+
+{% endblock %}

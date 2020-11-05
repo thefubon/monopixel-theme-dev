@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="format-detection" content="telephone=no">
+  {#<title>{% if title is defined %}{{ title }} - {% endif %}{{ siteName }}</title>#}
+  {#{ craft.myfavicon.html }#}
+  {% do minifier.view.registerCssFile('/uikit.css') %}
+  {% do minifier.view.registerCssFile('/reset.css') %}
+  {% do minifier.view.registerCssFile('/style.css') %}
+  {% do minifier.view.registerJsFile('/uikit.js', {position: POS_HEAD}) %}
+  {% do minifier.view.registerJsFile('/uikit-icons.js') %}
+  {% do minifier.view.registerJsFile('/lazysizes.min.js') %}
+  {% do minifier.view.registerJsFile('/scripts.js') %}
+  <link id="style" rel="stylesheet" type="text/css" href="/static/css/day.css" />
+</head>
+<body>
+
+
+  {# preloader -->
+  <div id="preloader" class="uk-overlay-primary uk-position-cover" style="z-index: 999999;">
+      <div class="uk-position-center">
+          <span uk-spinner="ratio: 2"></span>
+      </div>
+  </div>#}
+
+  {% if devMode %}
+    <div class="uk-text-center uk-alert uk-alert-warning uk-margin-remove">
+      {{ 'Site is running in dev mode.'|t }}
+    </div>
+  {% endif %}
+
+	<header class="header boundary-align" data-uk-sticky="media: 640; show-on-up: true;">
+		<nav class="uk-navbar-container uk-navbar-transparent">
+			<div class="uk-container uk-container-medium" data-uk-navbar>
+
+				<div class="uk-navbar-left">
+					<a class="uk-navbar-item uk-logo uk-text-bold uk-text-uppercase" rel="home" href="{{ siteUrl }}"><img class="uk-margin-small-right" src="/static/img/favicon/apple-icon-180x180.png" alt="{{ systemName|t }}" width="24" data-uk-svg /><h1 class="uk-margin-remove">{{ systemName|t }}</h1></a>
+
+          <ul class="uk-navbar-nav uk-navbar-parent-icon uk-visible@m">
+            {% set nodes = craft.navigation.nodes('header').all() %}
+            {% nav node in nodes %}
+            <li id="id-{{ node.id }}" class="{{ node.classes }} {% if node.active %}uk-active{% endif %}">
+              <a href="{{ node.url }}" class=""><span>{{ node.title }}</span></a>
+              {% ifchildren %}
+              <div class="uk-navbar-dropdown" data-uk-dropdown="pos: bottom-justify; boundary: .boundary-align; boundary-align: true; offset: 0; mode: click; animation: false;">
+                <div class="uk-container uk-container-medium">
+                  <ul class="uk-navbar-nav uk-flex-center">
+                    {% children %}
+                  </ul>
+                </div>
+              </div>
+              {% endifchildren %}
+            </li>
+            {% endnav %}
+
+            <li class="search-menu uk-visible@l">
+              <a class="uk-navbar-toggle" href="#"><span>{{ 'Search'|t }}</span></a>
+              <div class="uk-drop" data-uk-drop="mode: click; pos: right-center; offset: 0; animation: false; delay-hide: none;">
+                <form class="uk-search uk-search-navbar" action="{{ url('search/results') }}">
+                  <button class="uk-search-icon-flip uk-button-search" type="submit" data-uk-search-icon data-uk-svg id="submit" disabled></button>
+                  <input class="uk-search-input" type="search" name="q" placeholder="" id="name" autocomplete="off" onkeyup="checkParams()" required="required" autofocus>
+                </form>
+              </div>
+            </li>
+
+					</ul>
+				</div><!-- .uk-navbar-left -->
+
+				<div class="uk-navbar-right">
+          <div class="uk-navbar-item">
+            {% if currentUser %}
+              <a class="addpost-button" href="{{ siteUrl }}add"><span class="uk-icon-fix" data-uk-icon="icon: pencil"></span><span class="uk-margin-small-left uk-visible@m">{{ 'Add Post'|t }}</span></a>
+            	{% if currentUser.photo %}
+						  	<a class="uk-link-reset" href="#"><img id="user-photo" class="uk-border-rounded" src="{{ currentUser.photo.url({width: 80, height:80}) }}" width="36" alt="{{ currentUser.friendlyName|t }}"></a>
+              {% else %}
+                <a class="uk-link-reset uk-light" href="#"><div class="uk-background-primary uk-border-rounded uk-text-bold uk-inline uk-h4 uk-margin-remove" style="width: 36px; height: 36px;"><div class="uk-position-center uk-text-uppercase">{{ (currentUser.fullName ?? currentUser.username) | first }}</div></div></a>
+						  {% endif %}
+						  <div class="uk-border-rounded" uk-dropdown="mode: click; pos: bottom-right; offset: 20; animation: false; delay-hide: none;">
+					  		<ul class="uk-list uk-list-divider uk-link-text uk-margin-remove">
+						  		<li>{{ 'Welcome back, {name}'|t(params = {name: currentUser.friendlyName,}) }}</li>
+                  {% if currentUser.admin %}
+                  <li><a href="/rootpanel/"><span class="uk-margin-small-right uk-icon-fix" data-uk-icon="icon: cog;"></span>{{ 'Admin'|t }}</a></li>
+                  {% endif %}
+						  		<li><a href="/my-account"><span class="uk-margin-small-right uk-icon-fix" data-uk-icon="icon: user"></span>{{ 'My Profile'|t }}</a></li>
+                  <li><a href="#"><span class="uk-margin-small-right uk-icon-fix" data-uk-icon="icon: home"></span>{{ 'My Page'|t }}</a></li>
+									<li><a href="{{ logoutUrl }}"><span class="uk-margin-small-right uk-icon-fix" data-uk-icon="icon: sign-out"></span>{{ 'Logout'|t }}</a></li>
+					  		</ul>
+
+                {# Get the list #}
+                {% set list = craft.wishlist.lists().default(true).one() %}
+                {# Display list items #}
+                <ul class="uk-list">
+                    {% for item in list.items.all() %}
+                        <li>{{ item.title }} <a href="{{ item.removeUrl() }}">Удалить</a></li>
+                    {% endfor %}
+                </ul>
+						  </div>
+            {% else %}
+              <a class="addpost-button" href="{{ siteUrl }}add"><span class="uk-icon-fix" data-uk-icon="icon: pencil"></span><span class="uk-margin-small-left uk-visible@m">{{ 'Add Post'|t }}</span></a>
+              <a class="profile-button" href="{{ loginUrl }}"><span class="uk-icon-fix" data-uk-icon="icon: user"></span><span class="uk-margin-small-left uk-visible@m">{{ 'Sign in'|t }}</span></a>
+            {% endif %}
+          </div>
+
+          <div class="flag uk-navbar-item uk-margin-remove-left">
+            {% set element = (category ?? entry ?? null) %}
+            {% if craft.app.language == 'ru' %}
+              <a class="flag-en" href="{{ siteSwitcher('english', element) }}"></a>
+            {% else %}
+              <a  class="flag-ru" href="{{ siteSwitcher('default', element) }}"></a>
+            {% endif %}
+          </div>
+
+					<div class="uk-navbar-item uk-hidden">
+					  <a class="nav-toggle" href="#">
+					  	<span class="uk-toggle-line-one"></span>
+							<span class="uk-toggle-line-two"></span>
+							<span class="uk-toggle-line-three"></span>
+					  </a>
+					  <div data-uk-dropdown="pos: bottom-justify; boundary: .boundary-align; boundary-align: true; offset: 0; mode: click; animation: false;">
+				      <div class="uk-container uk-container-medium">
+
+					      <div class="uk-child-width-expand@s uk-grid-medium" data-uk-grid>
+							    <div>
+								    <div class="uk-card uk-card-border uk-card-hover uk-card-body uk-border-rounded">
+								    	<h2 class="uk-text-bold">Title</h2>
+								    	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sapien velit, aliquet eget commodo nec, auctor a sapien.</p>
+							    	</div>
+							    </div>
+							    <div>
+								    <div class="uk-card uk-card-border uk-card-hover uk-card-body uk-border-rounded">
+								    	<h2 class="uk-text-bold">Title</h2>
+								    	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sapien velit, aliquet eget commodo nec, auctor a sapien.</p>
+							    	</div>
+							    </div>
+							    <div>
+								    <div class="uk-card uk-card-border uk-card-hover uk-card-body uk-border-rounded">
+								    	<h2 class="uk-text-bold">Title</h2>
+								    	<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sapien velit, aliquet eget commodo nec, auctor a sapien.</p>
+							    	</div>
+							    </div>
+								</div>
+
+					    </div>
+				    </div>
+					</div><!-- .uk-navbar-item -->
+				</div><!-- .uk-navbar-right -->
+
+			</div><!-- navbar-container -->
+		</nav>
+
+    <div class="nav-scroller uk-hidden@m">
+    	<nav class="nav uk-navbar-container uk-navbar-transparent uk-background-default">
+    		<div class="uk-container uk-container-medium" data-uk-navbar>
+    			<div class="uk-navbar-center">
+    				<ul class="uk-navbar-nav">
+    					{% set nodes = craft.navigation.nodes('header').all() %}
+    					{% nav node in nodes %}
+              <li id="id-mob-{{ node.id }}" class="{{ node.classes }} {% if node.active %}uk-active{% endif %}">
+    						<a href="{{ node.url }}" class=""><span>{{ node.title }}</span></a>
+    						{% ifchildren %}
+    						<div class="uk-navbar-dropdown" data-uk-dropdown="pos: bottom-justify; boundary: .boundary-align; boundary-align: true; offset: 0; mode: click; animation: false;">
+    							<div class="uk-container uk-container-medium">
+    								<ul class="uk-navbar-nav uk-flex-center">
+    									{% children %}
+    								</ul>
+    							</div>
+    						</div>
+    						{% endifchildren %}
+    					</li>
+    					{% endnav %}
+    				</ul>
+    			</div>
+    		</div>
+    	</nav>
+    </div>
+	</header>
+
+  {# Breadcrumb settings array #}
+  {% set settings = { homeTitle: 'Home'|t } %}
+  {# Breadcrumb settings array #}
+  {% set breadcrumb = craft.breadcrumb.config(settings) %}
+  {% if breadcrumb|length > 1 %}
+  <div class="c-breadcrumb">
+    <div class="nav-scroller uk-container uk-container-medium">
+      <ul class="nav c-breadcrumb__items uk-breadcrumb">
+        {% for crumb in breadcrumb  %}
+          {% if loop.last %}
+          <li class="c-breadcrumb__item"><span>{{ crumb.title }}</span></li>
+          {% else %}
+          <li class="c-breadcrumb__item"><a class="c-breadcrumb__link" href="{{ crumb.url }}"><span>{{ crumb.title }}</span></a></li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  {% endif %}
+
+	<main data-uk-height-viewport="expand: true">
+    {% block main %}{% endblock %}
+	</main>
+
+  <div class="uk-section uk-section-xsmall" style="border-top: 1px solid #e1e1e1;">
+    <div class="uk-container uk-container-medium uk-text-meta">
+      <ul class="uk-subnav">
+        {% set nodes = craft.navigation.nodes('footer').all() %}
+        {% nav node in nodes %}
+        <li id="id-{{ node.id }}" class="{{ node.classes }} {% if node.active %}uk-active{% endif %}">
+          <a href="{{ node.url }}" class="">{{ node.title }}</a>
+          {% ifchildren %}
+          <div class="uk-navbar-dropdown" data-uk-dropdown="pos: bottom-justify; boundary: .boundary-align; boundary-align: true; offset: 0; mode: click; animation: false;">
+            <div class="uk-container uk-container-medium">
+              <ul class="uk-navbar-nav uk-flex-center">
+                {% children %}
+              </ul>
+            </div>
+          </div>
+          {% endifchildren %}
+        </li>
+        {% endnav %}
+      </ul>
+    </div>
+  </div>
+
+	<footer class="footer uk-section uk-section-xsmall">
+		<div class="uk-container uk-container-medium uk-text-meta">
+
+      <div class="uk-grid-small uk-child-width-1-2@m" data-uk-grid>
+        <div class="uk-text-left@m uk-text-center">
+          &copy; 2015-{{ now|date('Y') }} {{ systemName|t }} — Bom Shankar! <a href="#" data-uk-totop data-uk-scroll></a>
+        </div>
+        <div class="uk-text-right@m uk-text-center">
+          {#  {% if currentUser.admin %}Пиписька | {% endif %} #}
+          <a href="https://validator.w3.org/nu/?doc={{ craft.app.request.absoluteUrl }}" target="_blank">W3C</a> | <a href="https://developers.google.com/speed/pagespeed/insights/?url={{ craft.app.request.absoluteUrl }}" target="_blank">PageSpeed</a> | {{ 'Created by'|t }} <a class="uk-link-text uk-text-bold" href="//fubon.pro" target="_blank">Fubon</a>
+        </div>
+      </div>
+
+
+      {% if devMode %}
+      <div class="uk-margin uk-text-center">
+        ID: {{ currentSite.id }} | Handle: {{ currentSite.handle }} | Name: {{ currentSite.name }} | Language: {{ currentSite.language }} | Is Primary Site?: {{ currentSite.primary }} | Base URL: {{ currentSite.baseUrl }}<br><br>{% if craft.app.language == 'ru' %}Пиписька{% else %}Pipiska{% endif %}
+      </div>
+      {% endif %}
+
+		</div>
+	</footer>
+</body>
+</html>

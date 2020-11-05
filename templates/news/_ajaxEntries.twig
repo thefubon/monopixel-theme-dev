@@ -1,0 +1,19 @@
+
+{% for entry in entries  %}
+  <div>
+    <article id="{{ entry.id }}" class="uk-article uk-margin uk-background-default uk-border-rounded uk-overflow-hidden">
+      {% set entryImage = entry.thumbnail.all() %}
+      {% if entryImage|length %}
+        {% for img in entryImage %}
+        <a class="uk-link-text" href="{{ entry.url }}"><a class="uk-link-text" href="{{ entry.url }}"><img src="{{ img.getUrl }}"></a></a>
+        {% endfor %}
+      {% endif %}
+      <div class="uk-padding-small">
+        <h2 class="uk-h3 uk-text-bold"><a class="" href="{{ entry.url }}">{{ entry.title }}</a></h2>
+        <p class="uk-article-meta">{{ entry.author }} | {{ entry.postDate|date('d.m.Y') }}
+
+
+      </div>
+    </article>
+  </div>
+{% endfor %}

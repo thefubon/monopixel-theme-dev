@@ -1,0 +1,44 @@
+{% extends "_layout" %}
+{% set title = "Статьи" %}
+{% block main %}
+<div class="uk-section uk-section-xsmall uk-container uk-container-medium">
+
+{% set csrfToken = {
+    csrfTokenName: craft.app.config.general.csrfTokenName,
+    csrfTokenValue: craft.app.request.csrfToken,
+} %}
+
+{% js %}
+window.Craft = {{ csrfToken | json_encode | raw }};
+{% endjs %}
+
+
+<script type="text/javascript">
+  window.Craft = {{ csrfToken|json_encode|raw }};
+</script>
+
+	{{ craft.craftAjaxinate.render() }}
+
+	<div class="uk-grid-medium" data-uk-grid>
+	<div class="uk-width-expand">
+		<div class="ajaxDataDump uk-grid-small uk-child-width-1-2@m" data-uk-grid="masonry: true"></div>
+		{{ craft.craftAjaxinate.loadMoreVariable({
+      btnWrapperClass:'ajaxBtn',
+      loadMoreName: 'Load More'|t })
+		}}
+	</div>
+	<div class="uk-width-1-4">
+
+
+
+
+	{# Кнопка загрузить еще #}
+
+
+
+
+	</div>
+	</div>
+
+</div>
+{% endblock %}
